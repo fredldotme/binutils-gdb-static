@@ -27937,17 +27937,20 @@ else
     if test -d "${with_python}"; then
       # Assume the python binary is ${with_python}/bin/python.
       python_prog="${with_python}/bin/python"
+      python_config_prog="${with_python}/bin/python3-config"
       python_prefix=
       # If python does not exit ${with_python}/bin, then try in
       # ${with_python}.  On Windows/MinGW, this is where the Python
       # executable is.
       if test ! -x "${python_prog}"; then
         python_prog="${with_python}/python"
+        python_config_prog="${with_python}/python3-config"
         python_prefix=
       fi
       if test ! -x "${python_prog}"; then
         # Fall back to gdb 7.0/7.1 behavior.
         python_prog=missing
+        python_config_prog=missing
         python_prefix=${with_python}
       fi
     elif test -x "${with_python}"; then
@@ -27955,6 +27958,7 @@ else
       # the user could write a script that provides the needed information,
       # so we support that.
       python_prog=${with_python}
+      python_config_prog="python3-config"
       python_prefix=
     else
       as_fn_error $? "invalid value for --with-python" "$LINENO" 5
@@ -28086,21 +28090,22 @@ fi
     # We have a python program to use, but it may be too old.
     # Don't flag an error for --with-python=auto (the default).
     have_python_config=yes
-    python_includes=`${python_prog} --includes`
+    python_config_prog="/bin/python3-config"
+    python_includes=`${python_config_prog} --includes`
     if test $? != 0; then
       have_python_config=failed
       if test "${with_python}" != auto; then
 	as_fn_error $? "failure running python-config3 --includes" "$LINENO" 5
       fi
     fi
-    python_libs=`${python_prog} --embed --ldflags`
+    python_libs=`${python_config_prog} --embed --ldflags`
     if test $? != 0; then
       have_python_config=failed
       if test "${with_python}" != auto; then
 	as_fn_error $? "failure running python-config3 --ldflags" "$LINENO" 5
       fi
     fi
-    python_prefix=`${python_prog} --exec-prefix`
+    python_prefix=`${python_config_prog} --exec-prefix`
     if test $? != 0; then
       have_python_config=failed
       if test "${with_python}" != auto; then
